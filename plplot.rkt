@@ -29,7 +29,7 @@
   (syntax-rules ()
     [(_ name body)
      (begin
-       ;;(provide name)
+       (provide name)
        (define-ffi-lib-internal name body))]))
 
 
@@ -560,8 +560,6 @@
         (window : PLINT_NC_SCALAR)
         -> _void))
 
-
-
 ;; Clear current subpage.
 (define-ffi+provide c_plclear
   (_fun -> _void))
@@ -763,10 +761,11 @@
 ;; Returns 8 bit RGB values for given color from color map 0
 (define-ffi+provide c_plgcol0
   (_fun (icol0 : PLINT)
-        (r : PLINT_NC_SCALAR)
-        (g : PLINT_NC_SCALAR)
-        (b : PLINT_NC_SCALAR)
-        -> _void))
+        (r : (_ptr o PLINT))
+        (g : (_ptr o PLINT))
+        (b : (_ptr o PLINT))
+        -> _void
+        -> (values r g b)))
 
 ;; Returns 8 bit RGB values for given color from color map 0 and alpha value
 (define-ffi+provide c_plgcol0a
@@ -994,13 +993,15 @@
 
 ;; Functions for converting between HLS and RGB color space
 (define-ffi+provide c_plhlsrgb
-  (_fun (h : PLFLT)
-        (l : PLFLT)
-        (s : PLFLT)
-        (p_r : PLFLT_NC_SCALAR)
-        (p_g : PLFLT_NC_SCALAR)
-        (p_b : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun (h l s) ::
+        (h : PLFLT = (+ h 0.0))
+        (l : PLFLT = (+ l 0.0))
+        (s : PLFLT = (+ s 0.0))
+        (p_r : (_ptr o PLFLT))
+        (p_g : (_ptr o PLFLT))
+        (p_b : (_ptr o PLFLT))
+        -> _void
+        -> (values p_r p_g p_b)))
 
 ;; Initializes PLplot, using preset or default options
 (define-ffi+provide c_plinit
@@ -2269,7 +2270,8 @@
 
 ;; Set pen width.
 (define-ffi+provide c_plwidth
-  (_fun (width : PLFLT)
+  (_fun (width) ::
+        (width : PLFLT = (+ width 0.0))
         -> _void))
 
 ;; Set up world coordinates of the viewport boundaries (2d plots).

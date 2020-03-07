@@ -1,0 +1,1 @@
+("7.6" racket ("bda612b2133aa983afb94ca6dd5bce5d923f8b76" . "d3c89a3fee51eefbb09e4f227b5b77ee421584a0") #"/home/petr/db-dec/Projects/Racket-PLplot/plplot/examples/../plplot.rkt" (collects #"ffi" #"unsafe.rkt") (collects #"racket" #"main.rkt") (collects #"racket" #"runtime-config.rkt"))
