@@ -33,7 +33,7 @@
        (define-ffi-lib-internal name body))]))
 
 
-(define+provide PLFLT   _double)
+(define+provide PLFLT   _double*)
 (define+provide PLUINT  _uint32)
 (define+provide PLINT   _int32)
 (define+provide PLINT64 _int64)
@@ -256,7 +256,7 @@
    [keysym _uint] ;; key selected
    [button _uint] ;; mouse button selected
    [subwindow PLINT] ;; subwindow (alias subpage, alias subplot) number
-   [string (_array/vector _ubyte PL_MAXKEY)] ;; translated string
+   [string (_array/list _ubyte PL_MAXKEY)] ;; translated string
    [pX _int] ;; absolute device coordinates of pointer
    [pY _int]
    [dX PLFLT] ;; relative device coordinates of pointer
@@ -670,7 +670,8 @@
 
 ;; Simple interface for defining viewport and window.
 (define-ffi+provide c_plenv
-  (_fun (xmin : PLFLT)
+  (_fun (xmin xmax ymin ymax just axis) :: 
+        (xmin : PLFLT)
         (xmax : PLFLT)
         (ymin : PLFLT)
         (ymax : PLFLT)
@@ -927,8 +928,10 @@
 
 ;; Get current stream number.
 (define-ffi+provide c_plgstrm
-  (_fun (p_strm : PLINT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (p_strm : (_ptr o PLINT))
+        -> _void
+        -> p_strm))
 
 ;; Get the current library version number
 (define-ffi+provide c_plgver
@@ -994,9 +997,9 @@
 ;; Functions for converting between HLS and RGB color space
 (define-ffi+provide c_plhlsrgb
   (_fun (h l s) ::
-        (h : PLFLT = (+ h 0.0))
-        (l : PLFLT = (+ l 0.0))
-        (s : PLFLT = (+ s 0.0))
+        (h : PLFLT)
+        (l : PLFLT)
+        (s : PLFLT)
         (p_r : (_ptr o PLFLT))
         (p_g : (_ptr o PLFLT))
         (p_b : (_ptr o PLFLT))
@@ -1282,8 +1285,10 @@
 
 ;; Creates a new stream and makes it the default.
 (define-ffi+provide c_plmkstrm
-  (_fun (p_strm : PLINT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (p_strm : (_ptr o PLINT))
+        -> _void
+        -> p_strm))
 
 ;; Prints out "text" at specified position relative to viewport
 (define-ffi+provide c_plmtex
@@ -1971,7 +1976,7 @@
 
 ;; Create 1d stripchart
 (define-ffi+provide c_plstripc
-  (_fun (id : PLINT_NC_SCALAR)
+  (_fun (id : (_ptr o PLINT))
         (xspec : PLCHAR_VECTOR)
         (yspec : PLCHAR_VECTOR)
         (xmin : PLFLT)
@@ -1991,7 +1996,8 @@
         (labx : PLCHAR_VECTOR)
         (laby : PLCHAR_VECTOR)
         (labtop : PLCHAR_VECTOR)
-        -> _void))
+        -> _void
+        -> id))
 
 ;; Deletes and releases memory used by a stripchart.
 (define-ffi+provide c_plstripd
@@ -2078,8 +2084,8 @@
 ;; Set up a new line style
 (define-ffi+provide c_plstyl
   (_fun (nms : PLINT)
-        (mark : PLINT_VECTOR)
-        (space : PLINT_VECTOR)
+        (mark : (_ptr i PLINT))
+        (space : (_ptr i PLINT))
         -> _void))
 
 ;; Plots the 3d surface representation of the function z[x][y].
@@ -2285,8 +2291,9 @@
 ;; Set xor mode; mode = 1-enter, 0-leave, status = 0 if not interactive device
 (define-ffi+provide c_plxormod
   (_fun (mode : PLBOOL)
-        (status : PLBOOL_NC_SCALAR)
-        -> _void))
+        (status : (_ptr o PLBOOL))
+        -> _void
+        -> status))
 
 
 ;;--------------------------------------------------------------------------
@@ -2632,8 +2639,16 @@
 
 ;; Wait for graphics input event and translate to world coordinates
 (define-ffi+provide plGetCursor
-  (_fun (*gin : _PLGraphicsIn-pointer/null)
-        -> PLINT))
+  (_fun ((*gin #f)) ::
+        (gin : _PLGraphicsIn-pointer/null =
+             (if *gin
+                 *gin
+                 (ptr-ref (malloc _PLGraphicsIn)
+                          _PLGraphicsIn)))
+        -> (status : PLINT)
+        -> (if *gin
+               status
+               (values status gin))))
 
 ;; Translates relative device coordinates to world coordinates.
 (define-ffi+provide plTranslateCursor

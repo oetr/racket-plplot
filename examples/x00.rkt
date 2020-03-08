@@ -18,7 +18,7 @@
   (vector-set! x i x_i)
   (vector-set! y i (* ymax x_i x_i)))
 
-(c_plscolbg 255 255 255)
+(c_plscolbga 255 255 255 0.1)
 ;; Initialize plplot
 (c_plinit)
 
