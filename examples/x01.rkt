@@ -1,7 +1,7 @@
 #lang racket
 
 (require ffi/unsafe
-         "../plplot.rkt")
+         plplot.rkt)
 
 
 (define *x* (make-vector 101))

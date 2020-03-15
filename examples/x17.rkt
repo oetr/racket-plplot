@@ -2,7 +2,7 @@
 #lang racket
 
 (require ffi/unsafe
-         "../plplot.rkt"
+         plplot
          "utilities.rkt")
 
 (define nsteps 10000)

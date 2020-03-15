@@ -4,8 +4,9 @@
 ;; Generates polar plot, with 1-1 scaling.
 
 (require ffi/unsafe
-         "utilities.rkt"
-         "../plplot.rkt")
+         plplot
+         "utilities.rkt")
+
 
 
 (define x0 (make-vector 361))
