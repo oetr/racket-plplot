@@ -5,7 +5,7 @@
          "../plplot.rkt"
          "utilities.rkt")
 
-(define nsteps 100)
+(define nsteps 10000)
 
 ;;--------------------------------------------------------------------------
 ;; main program
@@ -95,7 +95,6 @@
 (define noise 0.0)
 
 (for ([n nsteps])
-  (sleep 0.0000001)
   (set! t (* n dt))
   (set! noise (- (random) 0.5))
   (set! y1 (+ y1 noise))
