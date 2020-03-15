@@ -1,0 +1,4 @@
+FFI bindings to PLplot.
+
+* Installation
+=raco pkg install plplot=
