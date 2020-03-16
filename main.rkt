@@ -941,19 +941,23 @@
 
 ;; Get viewport boundaries in normalized device coordinates
 (define-ffi+provide c_plgvpd
-  (_fun (p_xmin : PLFLT_NC_SCALAR)
-        (p_xmax : PLFLT_NC_SCALAR)
-        (p_ymin : PLFLT_NC_SCALAR)
-        (p_ymax : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (xmin : (_ptr o PLFLT))
+        (xmax : (_ptr o PLFLT))
+        (ymin : (_ptr o PLFLT))
+        (ymax : (_ptr o PLFLT))
+        -> _void
+        -> (values xmin xmax ymin ymax)))
 
 ;; Get viewport boundaries in world coordinates
 (define-ffi+provide c_plgvpw
-  (_fun (p_xmin : PLFLT_NC_SCALAR)
-        (p_xmax : PLFLT_NC_SCALAR)
-        (p_ymin : PLFLT_NC_SCALAR)
-        (p_ymax : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (xmin : (_ptr o PLFLT))
+        (xmax : (_ptr o PLFLT))
+        (ymin : (_ptr o PLFLT))
+        (ymax : (_ptr o PLFLT))
+        -> _void
+        -> (values xmin xmax ymin ymax)))
 
 ;; Get x axis labeling parameters
 (define-ffi+provide c_plgxax

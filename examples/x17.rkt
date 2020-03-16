@@ -2,7 +2,7 @@
 #lang racket
 
 (require ffi/unsafe
-         plplot
+         "../main.rkt"
          "utilities.rkt")
 
 (define nsteps 10000)
@@ -120,3 +120,4 @@
 
 (c_plstripd id1)
 (c_plend)
+

@@ -1,7 +1,7 @@
 #lang racket
 
 (require ffi/unsafe
-         plplot)
+         "../main.rkt")
 
 (define NSIZE 101)
 

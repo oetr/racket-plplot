@@ -4,7 +4,7 @@
 ;; Generates polar plot, with 1-1 scaling.
 
 (require ffi/unsafe
-         plplot
+         "../main.rkt"
          "utilities.rkt")
 
 
