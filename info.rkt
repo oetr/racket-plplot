@@ -2,7 +2,8 @@
 
 (define collection "plplot")
 
-(define deps '("base"))
+(define deps '("scribble-lib"
+               "base"))
 
 (define version "0.1")
 

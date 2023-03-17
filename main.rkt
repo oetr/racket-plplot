@@ -4,7 +4,6 @@
          ffi/unsafe/define
          racket/provide)
 
-
 (define-syntax define+provide
   (syntax-rules ()
     [(_ (name args ... . rest) body ...)
@@ -21,7 +20,7 @@
        (define name body))]))
 
 
-(define plplot-lib (ffi-lib "libplplotd"))
+(define plplot-lib (ffi-lib "libplplot"))
 
 (define-ffi-definer define-ffi-lib-internal plplot-lib)
 
@@ -749,9 +748,13 @@
 
 ;; Get character default height and current (scaled) height
 (define-ffi+provide c_plgchr
-  (_fun (p_def : PLFLT_NC_SCALAR)
-        (p_ht : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (p_def : (_ptr o PLFLT))
+        (p_ht : (_ptr o PLFLT))
+        -> _void
+        -> (make-hash
+            (list (cons 'p_def p_def)
+                  (cons 'p_ht p_ht)))))
 
 ;; Get the color map 1 range used in continuous plots
 (define-ffi+provide c_plgcmap1_range
@@ -761,67 +764,105 @@
 
 ;; Returns 8 bit RGB values for given color from color map 0
 (define-ffi+provide c_plgcol0
-  (_fun (icol0 : PLINT)
+  (_fun (icol0) ::
+        (icol0 : PLINT)
+        (r :     (_ptr o PLINT))
+        (g :     (_ptr o PLINT))
+        (b :     (_ptr o PLINT))
+        -> _void
+        -> (make-hash
+            (list (cons 'r r)
+                  (cons 'g g)
+                  (cons 'b b)))))
+
+;; Returns 8 bit RGB values for given color from color map 0 and alpha value
+(define-ffi+provide c_plgcol0a
+  (_fun (icol0) ::
+        (icol0 : PLINT)
+        (r : (_ptr o PLINT))
+        (g : (_ptr o PLINT))
+        (b : (_ptr o PLINT))
+        (alpha : (_ptr o PLFLT))
+        -> _void
+        -> (make-hash
+            (list (cons 'r r)
+                  (cons 'g g)
+                  (cons 'b b)
+                  (cons 'alpha alpha)))))
+
+;; Returns the background color by 8 bit RGB value
+(define-ffi+provide c_plgcolbg
+  (_fun () ::
         (r : (_ptr o PLINT))
         (g : (_ptr o PLINT))
         (b : (_ptr o PLINT))
         -> _void
-        -> (values r g b)))
-
-;; Returns 8 bit RGB values for given color from color map 0 and alpha value
-(define-ffi+provide c_plgcol0a
-  (_fun (icol0 : PLINT)
-        (r : PLINT_NC_SCALAR)
-        (g : PLINT_NC_SCALAR)
-        (b : PLINT_NC_SCALAR)
-        (alpha : PLFLT_NC_SCALAR)
-        -> _void))
-
-;; Returns the background color by 8 bit RGB value
-(define-ffi+provide c_plgcolbg
-  (_fun (r : PLINT_NC_SCALAR)
-        (g : PLINT_NC_SCALAR)
-        (b : PLINT_NC_SCALAR)
-        -> _void))
+        -> (make-hash
+            (list (cons 'r r)
+                  (cons 'g g)
+                  (cons 'b b)))))
 
 ;; Returns the background color by 8 bit RGB value and alpha value
 (define-ffi+provide c_plgcolbga
-  (_fun (r : PLINT_NC_SCALAR)
-        (g : PLINT_NC_SCALAR)
-        (b : PLINT_NC_SCALAR)
-        (alpha : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (r :     (_ptr o PLINT))
+        (g :     (_ptr o PLINT))
+        (b :     (_ptr o PLINT))
+        (alpha : (_ptr o PLFLT))
+        -> _void
+        -> (make-hash
+            (list (cons 'r r)
+                  (cons 'g g)
+                  (cons 'b b)
+                  (cons 'alpha alpha)))))
 
 ;; Returns the current compression setting
 (define-ffi+provide c_plgcompression
-  (_fun (compression : PLINT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (compression : (_ptr o PLINT))
+        -> _void
+        -> compression))
 
 ;; Get the current device (keyword) name
 (define-ffi+provide c_plgdev
-  (_fun (p_dev : PLCHAR_NC_VECTOR)
-        -> _void))
+  (_fun () ::
+        (p_dev : _pointer = (malloc _pointer 'atomic-interior))
+        -> _void
+        -> (cast p_dev _pointer _string/eof)))
 
 ;; Retrieve current window into device space
 (define-ffi+provide c_plgdidev
-  (_fun (p_mar : PLFLT_NC_SCALAR)
-        (p_aspect : PLFLT_NC_SCALAR)
-        (p_jx : PLFLT_NC_SCALAR)
-        (p_jy : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (p_mar :    (_ptr o PLFLT))
+        (p_aspect : (_ptr o PLFLT))
+        (p_jx :     (_ptr o PLFLT))
+        (p_jy :     (_ptr o PLFLT))
+        -> _void
+        -> (make-hash
+            (list (cons 'p_mar p_mar)
+                  (cons 'p_aspect p_aspect)
+                  (cons 'p_jx p_jx)
+                  (cons 'p_jy p_jy)))))
 
 ;; Get plot orientation
 (define-ffi+provide c_plgdiori
-  (_fun (p_rot : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (p_rot : (_ptr o PLFLT))
+        -> _void
+        -> p_rot))
 
 ;; Retrieve current window into plot space
 (define-ffi+provide c_plgdiplt
-  (_fun (p_xmin : PLFLT_NC_SCALAR)
-        (p_ymin : PLFLT_NC_SCALAR)
-        (p_xmax : PLFLT_NC_SCALAR)
-        (p_ymax : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun (p_xmin : (_ptr o PLFLT))
+        (p_ymin : (_ptr o PLFLT))
+        (p_xmax : (_ptr o PLFLT))
+        (p_ymax : (_ptr o PLFLT))
+        -> _void
+        -> (make-hash
+            (list (cons 'p_xmin p_xmin)
+                  (cons 'p_ymin p_ymin)
+                  (cons 'p_xmax p_xmax)
+                  (cons 'p_ymax p_ymax)))))
 
 ;; Get the drawing mode
 (define-ffi+provide c_plgdrawmode
@@ -853,18 +894,28 @@
 
 ;; Get the (current) run level.
 (define-ffi+provide c_plglevel
-  (_fun (p_level : PLINT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (p_level : (_ptr o PLINT))
+        -> _void
+        -> p_level))
 
 ;; Get output device parameters.
 (define-ffi+provide c_plgpage
-  (_fun (p_xp : PLFLT_NC_SCALAR)
-        (p_yp : PLFLT_NC_SCALAR)
-        (p_xleng : PLINT_NC_SCALAR)
-        (p_yleng : PLINT_NC_SCALAR)
-        (p_xoff : PLINT_NC_SCALAR)
-        (p_yoff : PLINT_NC_SCALAR)
-        -> _void))
+  (_fun () ::
+        (p_xp : (_ptr o PLFLT))
+        (p_yp : (_ptr o PLFLT))
+        (p_xleng : (_ptr o PLINT))
+        (p_yleng : (_ptr o PLINT))
+        (p_xoff : (_ptr o PLINT))
+        (p_yoff : (_ptr o PLINT))
+        -> _void
+        ->  (make-hash
+             (list (cons 'p_xp p_xp)
+                   (cons 'p_yp p_yp)
+                   (cons 'p_xleng p_xleng)
+                   (cons 'p_yleng p_yleng)
+                   (cons 'p_xoff p_xoff)
+                   (cons 'p_yoff p_yoff)))))
 
 ;; Switches to graphics screen.
 (define-ffi+provide c_plgra
@@ -920,11 +971,13 @@
 
 ;; Get subpage boundaries in absolute coordinates
 (define-ffi+provide c_plgspa
-  (_fun (xmin : PLFLT_NC_SCALAR)
-        (xmax : PLFLT_NC_SCALAR)
-        (ymin : PLFLT_NC_SCALAR)
-        (ymax : PLFLT_NC_SCALAR)
-        -> _void))
+  (_fun ()::
+        (xmin : (_ptr o PLFLT))
+        (xmax : (_ptr o PLFLT))
+        (ymin : (_ptr o PLFLT))
+        (ymax : (_ptr o PLFLT))
+        -> _void
+        -> (values xmin xmax ymin ymax)))
 
 ;; Get current stream number.
 (define-ffi+provide c_plgstrm
