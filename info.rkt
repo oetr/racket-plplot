@@ -2,11 +2,12 @@
 
 (define collection "plplot")
 
-(define deps '("scribble-lib"
-               "base"))
+(define deps '("base"))
 
-(define version "0.1")
+(define version "0.11")
+
+(define license 'AGPL-3.0-only)
 
 (define pkg-desc "FFI bindings to PLplot.")
-(define pkg-autors '(PS))
+(define pkg-autors '("Peter Samarin"))
 
